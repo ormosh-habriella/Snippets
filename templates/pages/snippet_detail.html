@@ -2,30 +2,45 @@
 
 {% block content %}
     <div class="container">
-    <div class="row">
-        <div class="col">
-            <fieldset disabled>
-        <div class="row disabled">
-            <div class="col col-8">
-                Название: <input type="text" value="{{ snippet.name }}" class="form-control">
-            </div>
-            <div class="col col-4">
-                Дата создания:<input type="text" value="{{ snippet.creation_date}}" class="form-control">
-            </div>
-        </div>
-        <hr>
         <div class="row">
             <div class="col">
-                <div class="p-2 h-100" style="border:1px solid #ced4da; border-radius:5px;">
-                    <p>
-                        {{ snippet.code }}
-                    </p>
-                </div>
+                <fieldset disabled>
+                    <div class="row disabled">
+                        <div class="col col-6">
+                            Название: <input type="text" value="{{ snippet.name }}" class="form-control">
+                        </div>
+                        <div class="col col-2">
+                            Дата создания:<input type="text" value="{{ snippet.creation_date|date:'d.m.Y H:i' }}"
+                                                 class="form-control">
+                        </div>
+                        <div class="col col-2">
+                            Дата обновления:<input type="text" value="{{ snippet.updated_at|date:'d.m.Y H:i' }}"
+                                                   class="form-control">
+                        </div>
+                        <div class="col col-2">
+                            Количество просмотров:<input type="text" value="{{ snippet.views_count }}"
+                                                         class="form-control">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <div class="p-2 h-100" style="border:1px solid #ced4da; border-radius:5px;">
+                                <p>
+                                    {{ snippet.code }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <label for="description" class="form-label">Описание:</label>
+                            <textarea class="form-control" rows="3" disabled>{{ snippet.description }}</textarea>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
         </div>
-    </fieldset>
-        </div>
-    </div>
     </div>
 
 {% endblock %}

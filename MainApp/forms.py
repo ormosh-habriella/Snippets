@@ -1,31 +1,36 @@
 from django import forms
+from MainApp.models import LANG_CHOICES, Snippet
 
-class SnippetForm(forms.Form):
-    name = forms.CharField(
-        label="",
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Название сниппета",
-            }
-        )
-    )
-    lang = forms.ChoiceField(
-        label="",
-        choices=[
-            ('', '--- Выберите язык ---'),
-            ("python", "Python"),
-            ("cpp", "C++"),
-            ("java", "Java"),
-            ("javascript", "JavaScript")
-        ],
-        required=True,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-    code = forms.CharField(
-        label="",
-        max_length=5000,
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 10, 'placeholder': 'Введите ваш код здесь'})
-    )
+
+
+class SnippetForm(forms.ModelForm):
+    class Meta:
+        model = Snippet
+        fields = ["name", "lang", "code", "description"]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название сниппета'}),
+            'lang': forms.Select(
+                choices=LANG_CHOICES,
+                attrs={'class': 'form-control'}
+            ),
+            'code': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Код сниппета'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Описание сниппета'}),
+        }
+
+        # Пример валидации на уровне поля (опционально)
+    def clean_name(self):
+            name = self.cleaned_data['name']
+            if len(name) < 3:
+                raise forms.ValidationError("Название должно содержать не менее 3 символов.")
+            return name
+
+        # Пример валидации на уровне формы (опционально)
+    def clean(self):
+            cleaned_data = super().clean()
+            code = cleaned_data.get('code')
+            description = cleaned_data.get('description')
+
+            if code and len(code) < 10 and not description:
+                # Если код очень короткий, а описание отсутствует, добавить ошибку
+                self.add_error(None, "Для очень короткого кода требуется описание.")  # Общая ошибка формы
+            return cleaned_data

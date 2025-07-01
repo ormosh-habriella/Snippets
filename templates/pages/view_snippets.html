@@ -33,6 +33,7 @@
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Название</th>
+                        <th scope="col">Язык</th>
                         <th scope="col">Дата создания</th>
                     </tr>
                     </thead>
@@ -41,6 +42,7 @@
                     {% for snippet in snippets %}
                     <tr>
                         <td scope="row">{{ snippet.id }}</td>
+
                         <td>
                             <a href={% url 'snippet-detail' snippet.id %}>{{ snippet.name }}</a>
                             <a href="{% url 'snippet-delete' snippet.id %}">
@@ -49,6 +51,10 @@
                             <a href="{% url 'snippet-edit' snippet.id %}">
                                     <i class="fa-solid fa-pencil"></i>
                             </a>
+                        </td>
+                        <td>
+                            <i class="fa-brands {{ snippet.icon_class }}"></i>
+                            {{ snippet.lang }}
                         </td>
                         <td>{{ snippet.creation_date }}</td>
                     </tr>
