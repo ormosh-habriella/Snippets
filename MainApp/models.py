@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 LANG_CHOICES = [
@@ -24,3 +25,5 @@ class Snippet(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     views_count = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE,
+                             blank=True, null=True)

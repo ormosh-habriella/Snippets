@@ -1,8 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import F
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from MainApp.models import Snippet, LANG_ICONS
 from MainApp.forms import SnippetForm
+from django.contrib import auth
 
 
 
@@ -13,6 +15,7 @@ def index_page(request):
     return render(request, 'pages/index.html', context)
 
 
+@login_required
 def add_snippet_page(request):
     if request.method == 'GET':
         form = SnippetForm()
@@ -22,7 +25,9 @@ def add_snippet_page(request):
     if request.method == 'POST':
         form = SnippetForm(request.POST)
         if form.is_valid():
-            form.save()
+            snippet = form.save(commit=False)
+            snippet.user = request.user
+            snippet.save()
             return redirect('snippets-page')
         else:
             context = {'form': form, "pagename": "Создание сниппета"}
@@ -78,3 +83,33 @@ def snippet_edit(request, id):
             form.save()
 
         return redirect('snippets-page')
+
+
+def login(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = auth.authenticate(request, username=username, password=password)
+        if user is not None:
+            auth.login(request, user)
+            return redirect('home')
+        else:
+            context = {
+                "errors": "Неверный username или password",
+            }
+            return render(request, "pages/index.html", context)
+
+
+def user_logout(request):
+    auth.logout(request)
+    return redirect('home')
+
+
+def my_snippets(request):
+    snippets = Snippet.objects.filter(user=request.user)
+    context = {
+        'pagename': 'Мои сниппеты',
+        'snippets': snippets
+    }
+    return render(request, 'pages/view_snippets.html', context)

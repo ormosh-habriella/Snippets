@@ -18,49 +18,49 @@
                 {% endif %}
 
                 {% csrf_token %}
-
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <ul>
+                            <li>{{ error }}</li>
                         </ul>
                     </div>
-                {% endif %}
-
+                {% endfor %}
                 <div class="mb-3">
-                    {{ form.name.label_tag }}
                     {{ form.name }}
-                    {% for error in form.name.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+                    {% if  form.name.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <ul>
+                                {% for error in form.name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
-
                 <div class="mb-3">
-                    {{ form.lang.label_tag }}
                     {{ form.lang }}
-                    {% for error in form.lang.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+                    {% if  form.lang.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <ul>
+                                {% for error in form.lang.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
-
                 <div class="mb-3">
-                    {{ form.code.label_tag }}
                     {{ form.code }}
-                    {% for error in form.code.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+                    {% if  form.code.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <ul>
+                                {% for error in form.code.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
-
-                <div class="mb-3">
-                    {{ form.description.label_tag }}
-                    {{ form.description }}
-                    {% for error in form.description.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
-                </div>
-
                 <input type="submit" class="btn btn-primary btn-block" value="Сохранить">
                 </form>
             </div>
