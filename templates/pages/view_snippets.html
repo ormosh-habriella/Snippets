@@ -9,7 +9,7 @@
     </style>
 {% endblock %}
 {% block content %}
-<!-- Begin page content -->
+    <!-- Begin page content -->
     <div class="container">
         <div class="row">
             <div class="col text-center">
@@ -41,25 +41,32 @@
                     <tbody>
 
                     {% for snippet in snippets %}
-                    <tr>
-                        <td scope="row">{{ snippet.id }}</td>
+                        <tr>
+                            <td scope="row">{{ snippet.id }}</td>
 
-                        <td>
-                            <a href={% url 'snippet-detail' snippet.id %}>{{ snippet.name }}</a>
-                            <a href="{% url 'snippet-delete' snippet.id %}">
-                            <i class="fa-solid fa-trash"></i>
-                            </a>
-                            <a href="{% url 'snippet-edit' snippet.id %}">
+                            <td>
+                                <a href={% url 'snippet-detail' snippet.id %}>{{ snippet.name }}</a>
+                                <a href="{% url 'snippet-delete' snippet.id %}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                                <a href="{% url 'snippet-edit' snippet.id %}">
                                     <i class="fa-solid fa-pencil"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <i class="fa-brands {{ snippet.icon_class }}"></i>
-                            {{ snippet.lang }}
-                        </td>
-                        <td>{{ snippet.creation_date }}</td>
-                        <td>{{ snippet.user | default:"Аноним" }}</td>
-                    </tr>
+                                </a>
+                            </td>
+                            <td>
+                                <i class="fa-brands {{ snippet.icon_class }}"></i>
+                                {{ snippet.lang }}
+                            </td>
+                            <td>{{ snippet.creation_date }}</td>
+                            <td>
+                                {% if snippet.public %}
+                                    <i class="fa-solid fa-lock-open"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-lock"></i>
+                                {% endif %}
+                                {{ snippet.user | default:"Аноним" }}
+                            </td>
+                        </tr>
                     {% endfor %}
 
                     </tbody>

@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from MainApp.models import Snippet, LANG_ICONS
-from MainApp.forms import SnippetForm
+from MainApp.forms import SnippetForm, UserRegistrationForm
 from django.contrib import auth
-
+from django.contrib.auth.decorators import login_required
 
 
 def get_icon_class(lang):
@@ -35,7 +35,10 @@ def add_snippet_page(request):
 
 
 def snippets_page(request):
-    snippets = Snippet.objects.all()
+    if request.user.is_authenticated:  # auth: all public + self private
+        snippets = Snippet.objects.filter(Q(public=True) | Q(public=False, user=request.user))
+    else:  # not auth: all public
+        snippets = Snippet.objects.filter(public=True)
     for snippet in snippets:
         snippet.icon_class = get_icon_class(snippet.lang)
     context = {
@@ -105,7 +108,7 @@ def user_logout(request):
     auth.logout(request)
     return redirect('home')
 
-
+@login_required()
 def my_snippets(request):
     snippets = Snippet.objects.filter(user=request.user)
     context = {
@@ -113,3 +116,23 @@ def my_snippets(request):
         'snippets': snippets
     }
     return render(request, 'pages/view_snippets.html', context)
+
+
+def user_registration(request):
+   if request.method == "GET": # page with form
+       form = UserRegistrationForm()
+       context = {
+           "form": form
+       }
+       return render(request, "pages/registration.html", context)
+
+   if request.method == "POST": # form data
+       form = UserRegistrationForm(request.POST)
+       if form.is_valid():
+           form.save()
+           return redirect('home')
+       else:
+           context = {
+               "form": form,
+           }
+           return render(request, "pages/registration.html", context)
