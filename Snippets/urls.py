@@ -14,4 +14,5 @@ urlpatterns = [
     path('logout', views.user_logout, name='logout'),
     path('snippets/my', views.my_snippets, name='my-snippets'),
     path('registration', views.user_registration, name='registration'),
+    path('comment/add', views.comment_add, name="comment_add"),
 ]

@@ -28,3 +28,10 @@ class Snippet(models.Model):
     public = models.BooleanField(default=True)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE,
                              blank=True, null=True)
+
+
+class Comment(models.Model):
+   text = models.TextField()
+   creation_date = models.DateTimeField(auto_now_add=True)
+   author = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
+   snippet = models.ForeignKey(to=Snippet, on_delete=models.CASCADE, related_name="comments")

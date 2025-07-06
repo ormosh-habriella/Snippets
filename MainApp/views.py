@@ -1,15 +1,16 @@
-from django.contrib.auth.decorators import login_required
 from django.db.models import F, Q
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from MainApp.models import Snippet, LANG_ICONS
-from MainApp.forms import SnippetForm, UserRegistrationForm
+from MainApp.models import Snippet, LANG_ICONS, Comment
+from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 
 
 def get_icon_class(lang):
     return LANG_ICONS.get(lang)
+
+
 def index_page(request):
     context = {'pagename': 'PythonBin'}
     return render(request, 'pages/index.html', context)
@@ -39,11 +40,18 @@ def snippets_page(request):
         snippets = Snippet.objects.filter(Q(public=True) | Q(public=False, user=request.user))
     else:  # not auth: all public
         snippets = Snippet.objects.filter(public=True)
+
+        # sort
+    sort = request.GET.get("sort")
+    if sort:
+        snippets = snippets.order_by(sort)
+
     for snippet in snippets:
         snippet.icon_class = get_icon_class(snippet.lang)
     context = {
         'pagename': 'Просмотр сниппетов',
-        'snippets': snippets
+        'snippets': snippets,
+        'sort': sort
     }
     return render(request, 'pages/view_snippets.html', context)
 
@@ -53,9 +61,13 @@ def snippet_detail(request, id):
     snippet.views_count = F('views_count') + 1
     snippet.save(update_fields=['views_count'])
     snippet.refresh_from_db()
+    comments = Comment.objects.all()
+    comment_form = CommentForm()
     context = {
         'pagename': f'Сниппет: {snippet.name}',
-        'snippet': snippet
+        'snippet': snippet,
+        'comments': comments,
+        'comment_form': comment_form,
     }
     return render(request, 'pages/snippet_detail.html', context)
 
@@ -108,6 +120,7 @@ def user_logout(request):
     auth.logout(request)
     return redirect('home')
 
+
 @login_required()
 def my_snippets(request):
     snippets = Snippet.objects.filter(user=request.user)
@@ -119,20 +132,38 @@ def my_snippets(request):
 
 
 def user_registration(request):
-   if request.method == "GET": # page with form
-       form = UserRegistrationForm()
-       context = {
-           "form": form
-       }
-       return render(request, "pages/registration.html", context)
+    if request.method == "GET":  # page with form
+        form = UserRegistrationForm()
+        context = {
+            "form": form
+        }
+        return render(request, "pages/registration.html", context)
 
-   if request.method == "POST": # form data
-       form = UserRegistrationForm(request.POST)
-       if form.is_valid():
-           form.save()
-           return redirect('home')
-       else:
-           context = {
-               "form": form,
-           }
-           return render(request, "pages/registration.html", context)
+    if request.method == "POST":  # form data
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        else:
+            context = {
+                "form": form,
+            }
+            return render(request, "pages/registration.html", context)
+
+@login_required()
+def comment_add(request):
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        snippet_id = request.POST.get('snippet_id')  # Получаем ID сниппета из формы
+        snippet = get_object_or_404(Snippet, id=snippet_id)
+
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.author = request.user  # Текущий авторизованный пользователь
+            comment.snippet = snippet
+            comment.save()
+
+        return redirect('snippet-detail',
+                        id=snippet_id)  # Предполагаем, что у вас есть URL для деталей сниппета с параметром pk
+
+    raise Http404

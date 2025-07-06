@@ -65,6 +65,18 @@
                         </div>
                     {% endif %}
                 </div>
+                <div class="mb-3">
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <ul>
+                                {% for error in form.description.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
                 <input type="submit" class="btn btn-primary btn-block" value="Сохранить">
                 </form>
             </div>
