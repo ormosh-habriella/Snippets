@@ -5,6 +5,7 @@ from MainApp.models import Snippet, LANG_ICONS, Comment
 from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 
 
 def get_icon_class(lang):
@@ -41,6 +42,15 @@ def snippets_page(request):
     else:  # not auth: all public
         snippets = Snippet.objects.filter(public=True)
 
+        # search
+    search = request.GET.get("search")
+    if search:
+        snippets = snippets.filter(
+            Q(name__icontains=search) |
+            Q(code__icontains=search) |
+            Q(description__icontains=search)
+        )
+
         # sort
     sort = request.GET.get("sort")
     if sort:
@@ -74,6 +84,8 @@ def snippet_detail(request, id):
 
 def snippet_delete(request, id):
     snippet = get_object_or_404(Snippet, id=id)
+    if snippet.user != request.user:
+        raise PermissionDenied()
     snippet.delete()
 
     return redirect('snippets-page')
@@ -149,6 +161,7 @@ def user_registration(request):
                 "form": form,
             }
             return render(request, "pages/registration.html", context)
+
 
 @login_required()
 def comment_add(request):
