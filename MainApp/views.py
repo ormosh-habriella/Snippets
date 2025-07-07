@@ -6,6 +6,7 @@ from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 
 
 def get_icon_class(lang):
@@ -58,10 +59,17 @@ def snippets_page(request):
 
     for snippet in snippets:
         snippet.icon_class = get_icon_class(snippet.lang)
+
+    # TODO: работает или пагинация или сортировка по полю!
+    paginator = Paginator(snippets, 1)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'pagename': 'Просмотр сниппетов',
         'snippets': snippets,
-        'sort': sort
+        'sort': sort,
+        'page_obj': page_obj,
     }
     return render(request, 'pages/view_snippets.html', context)
 
