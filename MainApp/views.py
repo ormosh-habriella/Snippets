@@ -1,12 +1,13 @@
 from django.db.models import F, Q
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from MainApp.models import Snippet, LANG_ICONS, Comment
+from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES
 from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.contrib.auth.models import User
 
 
 def get_icon_class(lang):
@@ -59,6 +60,15 @@ def snippets_page(request, my_snippets):
             Q(description__icontains=search)
         )
 
+        # filter
+    lang = request.GET.get("lang")
+    if lang:
+        snippets = snippets.filter(lang=lang)
+
+    user_id = request.GET.get("user_id")
+    if user_id:
+        snippets = snippets.filter(user__id=user_id)
+
         # sort
     sort = request.GET.get("sort")
     if sort:
@@ -77,6 +87,10 @@ def snippets_page(request, my_snippets):
         'snippets': snippets,
         'sort': sort,
         'page_obj': page_obj,
+        'LANG_CHOICES': LANG_CHOICES,
+        'users': User.objects.all(),
+        'lang': lang,
+        'user_id': user_id
     }
     return render(request, 'pages/view_snippets.html', context)
 
