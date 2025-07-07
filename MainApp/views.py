@@ -37,11 +37,18 @@ def add_snippet_page(request):
             return render(request, 'pages/add_snippet.html', context)
 
 
-def snippets_page(request):
-    if request.user.is_authenticated:  # auth: all public + self private
-        snippets = Snippet.objects.filter(Q(public=True) | Q(public=False, user=request.user))
-    else:  # not auth: all public
-        snippets = Snippet.objects.filter(public=True)
+def snippets_page(request, my_snippets):
+    if my_snippets:
+        if not request.user.is_authenticated:
+            raise PermissionDenied
+        pagename = 'Мои сниппеты'
+        snippets = Snippet.objects.filter(user=request.user)
+    else:
+        pagename = 'Просмотр сниппетов'
+        if request.user.is_authenticated:  # auth: all public + self private
+            snippets = Snippet.objects.filter(Q(public=True) | Q(public=False, user=request.user))
+        else:  # not auth: all public
+            snippets = Snippet.objects.filter(public=True)
 
         # search
     search = request.GET.get("search")
@@ -61,12 +68,12 @@ def snippets_page(request):
         snippet.icon_class = get_icon_class(snippet.lang)
 
     # TODO: работает или пагинация или сортировка по полю!
-    paginator = Paginator(snippets, 1)
+    paginator = Paginator(snippets, 2)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'pagename': 'Просмотр сниппетов',
+        'pagename': pagename,
         'snippets': snippets,
         'sort': sort,
         'page_obj': page_obj,
@@ -141,14 +148,18 @@ def user_logout(request):
     return redirect('home')
 
 
-@login_required()
-def my_snippets(request):
-    snippets = Snippet.objects.filter(user=request.user)
-    context = {
-        'pagename': 'Мои сниппеты',
-        'snippets': snippets
-    }
-    return render(request, 'pages/view_snippets.html', context)
+# @login_required()
+# def my_snippets(request):
+#     snippets = Snippet.objects.filter(user=request.user)
+#     paginator = Paginator(snippets, 2)
+#     page_number = request.GET.get("page")
+#     page_obj = paginator.get_page(page_number)
+#     context = {
+#         'pagename': 'Мои сниппеты',
+#         'snippets': snippets,
+#         'page_obj': page_obj,
+#     }
+#     return render(request, 'pages/view_snippets.html', context)
 
 
 def user_registration(request):
