@@ -44,7 +44,8 @@
                         <select class="form-select" id="languageFilter" name="lang">
                             <option value="">Выберите язык</option>
                             {% for LANG_CHOICE in LANG_CHOICES %}
-                                <option {% if lang == LANG_CHOICE.0 %}selected {% endif %} value="{{ LANG_CHOICE.0 }}">{{ LANG_CHOICE.1 }}</option>
+                                <option {% if lang == LANG_CHOICE.0 %}selected {% endif %}
+                                        value="{{ LANG_CHOICE.0 }}">{{ LANG_CHOICE.1 }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -96,35 +97,54 @@
                     </tr>
                     </thead>
                     <tbody>
+                    {% if page_obj.paginator.count > 0 %}
+                        {% for snippet in page_obj %}
+                            <tr>
+                                <td scope="row">{{ snippet.id }}</td>
 
-                    {% for snippet in page_obj %}
+                                <td>
+                                    <a href={% url 'snippet-detail' snippet.id %}>{{ snippet.name }}</a>
+                                    <a href="{% url 'snippet-delete' snippet.id %}">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                    <a href="{% url 'snippet-edit' snippet.id %}">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <i class="fa-brands {{ snippet.icon_class }}"></i>
+                                    {{ snippet.lang }}
+                                </td>
+                                <td>{{ snippet.creation_date }}</td>
+                                <td>
+                                    {% if snippet.public %}
+                                        <i class="fa-solid fa-lock-open"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-lock"></i>
+                                    {% endif %}
+                                    {{ snippet.user | default:"Аноним" }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
                         <tr>
-                            <td scope="row">{{ snippet.id }}</td>
-
-                            <td>
-                                <a href={% url 'snippet-detail' snippet.id %}>{{ snippet.name }}</a>
-                                <a href="{% url 'snippet-delete' snippet.id %}">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                                <a href="{% url 'snippet-edit' snippet.id %}">
-                                    <i class="fa-solid fa-pencil"></i>
-                                </a>
-                            </td>
-                            <td>
-                                <i class="fa-brands {{ snippet.icon_class }}"></i>
-                                {{ snippet.lang }}
-                            </td>
-                            <td>{{ snippet.creation_date }}</td>
-                            <td>
-                                {% if snippet.public %}
-                                    <i class="fa-solid fa-lock-open"></i>
-                                {% else %}
-                                    <i class="fa-solid fa-lock"></i>
-                                {% endif %}
-                                {{ snippet.user | default:"Аноним" }}
+                            <td colspan="5">
+                                <div class="alert alert-info text-center mt-4 mb-0">
+                                    {% if request.GET.search or request.GET.lang or request.GET.user_id %}
+                                        <h5 class="alert-heading">Сниппеты не найдены 😕</h5>
+                                        <p>По заданным фильтрам и/или запросу ничего не найдено.</p>
+                                        <a href="{% url 'snippets-page' %}" class="btn btn-outline-secondary mt-2">Сбросить
+                                            фильтры</a>
+                                    {% else %}
+                                        <h5 class="alert-heading">Сниппетов пока нет 📝</h5>
+                                        <p>Вы можете быть первым, кто создаст сниппет!</p>
+                                        <a href="{% url 'add-snippet-page' %}" class="btn btn-primary mt-2">Создать
+                                            сниппет</a>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
-                    {% endfor %}
+                    {% endif %}
 
 
                     </tbody>

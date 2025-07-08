@@ -6,15 +6,71 @@
             <div class="col">
                 <fieldset disabled>
                     <div class="row disabled">
-                        <div class="col col-6">
-                            Название: <input type="text" value="{{ snippet.name }}" class="form-control">
+                        <div class="mb-3">
+                            <a href="{% url 'snippets-page' %}" class="btn btn-outline-secondary">
+                                &larr; Назад к списку
+                            </a>
                         </div>
-                        <div class="col col-4">
-                            Дата создания:<input type="text" value="{{ snippet.creation_date }}" class="form-control">
+
+                        <!-- Карточка сниппета -->
+                        <div class="card shadow">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="mb-0">{{ snippet.name }}</h3>
+                                <div>
+                                    <a href="{% url 'snippet-edit' snippet.id %}" class="btn btn-sm btn-warning me-1">
+                                        <i class="fa-solid fa-pencil"></i> Редактировать
+                                    </a>
+                                    <a href="{% url 'snippet-delete' snippet.id %}" class="btn btn-sm btn-danger me-1">
+                                        <i class="fa-solid fa-trash"></i> Удалить
+                                    </a>
+                                    <button onclick="copyToClipboard()" class="btn btn-sm btn-secondary">
+                                        <i class="fa-solid fa-copy"></i> Копировать код
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <fieldset disabled>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            Название: <input type="text" value="{{ snippet.name }}"
+                                                             class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            Описание: <input type="text" value="{{ snippet.description }}"
+                                                             class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            Автор: <input type="text"
+                                                          value="{{ snippet.user.username|default:'Аноним' }}"
+                                                          class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            Язык: <input type="text" value="{{ snippet.lang }}" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            Дата создания: <input type="text" value="{{ snippet.creation_date }}"
+                                                                  class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            Последнее изменение: <input type="text" value="{{ snippet.updated_at }}"
+                                                                        class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            Просмотры: <input type="text" value="{{ snippet.views_count }}"
+                                                              class="form-control">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
                         </div>
-                        <div class="col col-2">
-                            Просмотры: <input type="text" value="{{ snippet.views_count }}" class="form-control">
-                        </div>
+
                     </div>
                     <hr>
                     <div class="row">
@@ -63,3 +119,71 @@
     </div>
 
 {% endblock %}
+
+
+
+{#{% extends 'base.html' %}#}
+{##}
+{#{% block content %}#}
+{#    <div class="container">#}
+{#        <div class="row">#}
+{#            <div class="col">#}
+{#                <fieldset disabled>#}
+{#                    <div class="row disabled">#}
+{#                        <div class="col col-6">#}
+{#                            Название: <input type="text" value="{{ snippet.name }}" class="form-control">#}
+{#                        </div>#}
+{#                        <div class="col col-4">#}
+{#                            Дата создания:<input type="text" value="{{ snippet.creation_date }}" class="form-control">#}
+{#                        </div>#}
+{#                        <div class="col col-2">#}
+{#                            Просмотры: <input type="text" value="{{ snippet.views_count }}" class="form-control">#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <hr>#}
+{#                    <div class="row">#}
+{#                        <div class="col">#}
+{#                            <div class="p-2 h-100" style="border:1px solid #ced4da; border-radius:5px;">#}
+{#                                <p>#}
+{#                                    {{ snippet.code }}#}
+{#                                </p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </fieldset>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="row">#}
+{#            <div class="col">#}
+{#                <form action="{% url 'comment_add' %}" method="POST">#}
+{#                    {% csrf_token %} {{ comment_form }}#}
+{#                    <input type="hidden" name="snippet_id" value="{{ snippet.id }}">#}
+{#                    <button type="submit">Добавить</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="row">#}
+{#            <div class="col">#}
+{#                <table border="1">#}
+{#                    <tr>#}
+{#                        <th>Автор</th>#}
+{#                        <th>Комментарий</th>#}
+{#                        <th>Дата</th>#}
+{#                    </tr>#}
+{#                    {% for comment in comments %}#}
+{#                        <tr>#}
+{#                            <td>{{ comment.author.username }}</td>#}
+{#                            <td>{{ comment.text }}</td>#}
+{#                            <td>{{ comment.creation_date|date:"Y-m-d H:i" }}</td>#}
+{#                        </tr>#}
+{#                    {% empty %}#}
+{#                        <tr>#}
+{#                            <td colspan="3">Пока нет комментариев. Будьте первым!</td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{#                </table>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{#{% endblock %}#}

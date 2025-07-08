@@ -90,7 +90,8 @@ def snippets_page(request, my_snippets):
         'LANG_CHOICES': LANG_CHOICES,
         'users': User.objects.all(),
         'lang': lang,
-        'user_id': user_id
+        'user_id': user_id,
+        'request': request,
     }
     return render(request, 'pages/view_snippets.html', context)
 
