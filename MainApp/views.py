@@ -70,7 +70,7 @@ def snippets_page(request, my_snippets):
     if sort:
         snippets = snippets.order_by(sort)
 
-   
+
 
     # TODO: работает или пагинация или сортировка по полю!
     paginator = Paginator(snippets, 5)
