@@ -1,4 +1,4 @@
-from django.db.models import F, Q
+from django.db.models import F, Q, Count, Avg
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES
@@ -8,10 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
-
-
-def get_icon_class(lang):
-    return LANG_ICONS.get(lang)
 
 
 def index_page(request):
@@ -74,13 +70,20 @@ def snippets_page(request, my_snippets):
     if sort:
         snippets = snippets.order_by(sort)
 
-    for snippet in snippets:
-        snippet.icon_class = get_icon_class(snippet.lang)
+   
 
     # TODO: работает или пагинация или сортировка по полю!
-    paginator = Paginator(snippets, 2)
+    paginator = Paginator(snippets, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
+    # users = User.objects.filter(snippet__isnull=False).distinct()
+    #
+    # snippets_count = Snippet.objects.count()
+
+    users = User.objects.annotate(
+        snippet_count=Count('snippet', filter=Q(snippet__public=True))
+    ).filter(snippet_count__gt=0)
 
     context = {
         'pagename': pagename,
@@ -88,7 +91,7 @@ def snippets_page(request, my_snippets):
         'sort': sort,
         'page_obj': page_obj,
         'LANG_CHOICES': LANG_CHOICES,
-        'users': User.objects.all(),
+        'users': users,
         'lang': lang,
         'user_id': user_id,
         'request': request,
@@ -97,7 +100,8 @@ def snippets_page(request, my_snippets):
 
 
 def snippet_detail(request, id):
-    snippet = get_object_or_404(Snippet, id=id)
+    # snippet = get_object_or_404(Snippet, id=id)
+    snippet = Snippet.objects.prefetch_related("comments").get(id=id)
     snippet.views_count = F('views_count') + 1
     snippet.save(update_fields=['views_count'])
     snippet.refresh_from_db()
@@ -214,3 +218,20 @@ def comment_add(request):
                         id=snippet_id)  # Предполагаем, что у вас есть URL для деталей сниппета с параметром pk
 
     raise Http404
+
+
+def snippet_stats(request):
+    snippets = Snippet.objects.aggregate(snippets_count=Count('id'),
+                                         public_snippets_count=Count('id', filter=Q(public=True)),
+                                         average_views_count=Avg('views_count'))
+    top5_snippets = Snippet.objects.order_by("-views_count").values("name", "views_count")[:5]
+    top3_users = User.objects.annotate(snippets_count=Count('snippet')).order_by("-snippets_count").values("username", "snippets_count")[:3]
+
+    context = {
+        'snippets': snippets,
+        'top5_snippets': top5_snippets,
+        'top3_users': top3_users,
+        'pagename': 'Статистика по сниппетам',
+    }
+
+    return render(request, "pages/snippet_stats.html", context)

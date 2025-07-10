@@ -15,4 +15,5 @@ urlpatterns = [
     path('snippets/my', views.snippets_page, {'my_snippets':True}, name='my-snippets'),
     path('registration', views.user_registration, name='registration'),
     path('comment/add', views.comment_add, name="comment_add"),
+    path('snippets/stats', views.snippet_stats, name="snippet-stats"),
 ]
