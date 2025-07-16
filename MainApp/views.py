@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.contrib import messages
+from MainApp.signals import snippet_view
 
 
 def index_page(request):
@@ -29,6 +30,7 @@ def add_snippet_page(request):
             snippet = form.save(commit=False)
             snippet.user = request.user
             snippet.save()
+            messages.success(request, 'Сниппет успешно создан')
             return redirect('snippets-page')
         else:
             context = {'form': form, "pagename": "Создание сниппета"}
@@ -103,9 +105,8 @@ def snippets_page(request, my_snippets):
 def snippet_detail(request, id):
     # snippet = get_object_or_404(Snippet, id=id)
     snippet = Snippet.objects.prefetch_related("comments").get(id=id)
-    snippet.views_count = F('views_count') + 1
-    snippet.save(update_fields=['views_count'])
-    snippet.refresh_from_db()
+    # Отправляем сигнал
+    snippet_view.send(sender=None, snippet=snippet)
     comments = Comment.objects.all()
     comment_form = CommentForm()
     context = {
@@ -122,6 +123,7 @@ def snippet_delete(request, id):
     if snippet.user != request.user:
         raise PermissionDenied()
     snippet.delete()
+    messages.success(request, 'Сниппет был успешно удален')
 
     return redirect('snippets-page')
 
@@ -143,6 +145,7 @@ def snippet_edit(request, id):
         form = SnippetForm(request.POST, instance=snippet)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Сниппет был успешно отредактирован')
 
         return redirect('snippets-page')
 
@@ -217,6 +220,7 @@ def comment_add(request):
             comment.author = request.user  # Текущий авторизованный пользователь
             comment.snippet = snippet
             comment.save()
+            messages.success(request, 'Комментарий был успешно добавлен')
 
         return redirect('snippet-detail',
                         id=snippet_id)  # Предполагаем, что у вас есть URL для деталей сниппета с параметром pk
