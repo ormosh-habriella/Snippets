@@ -18,22 +18,23 @@ class SnippetForm(forms.ModelForm):
         }
 
         # Пример валидации на уровне поля (опционально)
+
     def clean_name(self):
-            name = self.cleaned_data['name']
-            if len(name) < 3:
-                raise forms.ValidationError("Название должно содержать не менее 3 символов.")
-            return name
+        name = self.cleaned_data['name']
+        if len(name) < 3:
+            raise forms.ValidationError("Название должно содержать не менее 3 символов.")
+        return name
 
-        # Пример валидации на уровне формы (опционально)
+    # Пример валидации на уровне формы (опционально)
     def clean(self):
-            cleaned_data = super().clean()
-            code = cleaned_data.get('code')
-            description = cleaned_data.get('description')
+        cleaned_data = super().clean()
+        code = cleaned_data.get('code')
+        description = cleaned_data.get('description')
 
-            if code and len(code) < 10 and not description:
-                # Если код очень короткий, а описание отсутствует, добавить ошибку
-                self.add_error(None, "Для очень короткого кода требуется описание.")  # Общая ошибка формы
-            return cleaned_data
+        if code and len(code) < 10 and not description:
+            # Если код очень короткий, а описание отсутствует, добавить ошибку
+            self.add_error(None, "Для очень короткого кода требуется описание.")  # Общая ошибка формы
+        return cleaned_data
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -68,6 +69,15 @@ class UserRegistrationForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-   class Meta:
-      model = Comment
-      fields = ['text']
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Введите ваш комментарий здесь...',
+                    'rows': 5,
+                    'cols': 30,
+                }),
+        }
