@@ -33,6 +33,8 @@ def add_snippet_page(request):
             messages.success(request, 'Сниппет успешно создан')
             return redirect('snippets-page')
         else:
+            if form.errors.get('name'):
+                messages.error(request, f'Название должно содержать не менее 3 но не больше 20 символов')
             context = {'form': form, "pagename": "Создание сниппета"}
             return render(request, 'pages/add_snippet.html', context)
 

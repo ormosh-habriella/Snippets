@@ -23,6 +23,9 @@ class SnippetForm(forms.ModelForm):
         name = self.cleaned_data['name']
         if len(name) < 3:
             raise forms.ValidationError("Название должно содержать не менее 3 символов.")
+
+        if len(name) >20:
+            raise forms.ValidationError("Название должно содержать не больше 20 символов.")
         return name
 
     # Пример валидации на уровне формы (опционально)
