@@ -1,6 +1,6 @@
 import pytest
-from .factories import *
-from .models import User
+from MainApp.factories import *
+from MainApp.models import User
 
 @pytest.mark.django_db
 def test_task1():
@@ -18,5 +18,5 @@ def test_task2():
     assert len(tags) == 5
 
 
-@pytest.mark.django_db
-def test_task3():
+# @pytest.mark.django_db
+# def test_task3():

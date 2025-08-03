@@ -1,5 +1,5 @@
 import pytest
-from .views import index_page, add_snippet_page, snippets_page, snippet_detail
+from MainApp.views import index_page, add_snippet_page, snippets_page, snippet_detail
 from django.urls import reverse
 from django.test import Client
 from django.test import RequestFactory
@@ -430,10 +430,7 @@ def client():
     return Client()
 
 
-@pytest.fixture
-def user():
-    """Фикстура для создания пользователя"""
-    return UserFactory()
+
 
 
 @pytest.fixture
