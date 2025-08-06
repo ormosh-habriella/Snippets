@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+         .block {
+            width: 150px;
+            height: 150px;
+        }
+
+        .orange {
+            background-color: orange;
+        }
+
+        .green {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+<div id="colorBox" class="block orange"></div>
+<script>
+    const colorBox = document.getElementById('colorBox');
+
+    colorBox.addEventListener('mouseover', () => {
+        colorBox.classList.remove('orange');
+        colorBox.classList.add('green');
+    });
+    colorBox.addEventListener('mouseout', () => {
+        colorBox.classList.add('orange');
+        colorBox.classList.remove('green');
+    });
+</script>
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="text" name="name" placeholder="Введите ваше имя">
+<button id="submitButton">Отправить</button>
+<p id="greetingMessage"></p>
+<script>
+    const name = document.getElementsByName('name')[0];
+    const submitButton = document.getElementById('submitButton');
+    const message = document.getElementById('greetingMessage');
+
+    submitButton.addEventListener('click', () => {
+        const value = name.value
+        message.textContent = `Привет, ${value}!`;
+    });
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<ul id="itemList">
+    <li>Задача 1 <button class="delete-btn">Удалить</button></li>
+    <li>Задача 2 <button class="delete-btn">Удалить</button></li>
+    <li>Задача 3 <button class="delete-btn">Удалить</button></li>
+</ul>
+<script>
+    const allButtons = document.getElementsByClassName('delete-btn');
+
+    for (let button of allButtons) {
+        button.addEventListener('click', (event) => {
+            event.target.parentElement.remove();
+        })
+    }
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button id="counterButton">Нажми меня</button>
+<p>Количество кликов: <span id="clickCount">0</span></p>
+<script>
+    const counterButton = document.getElementById('counterButton');
+    const spanElement = document.getElementById('clickCount');
+    let count = 0
+    counterButton.addEventListener('click', () => {
+        count++
+        spanElement.textContent = `${count}`;
+    })
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .highlight { background-color: yellow; border: 2px solid orange; }
+    </style>
+</head>
+<body>
+<div class="box"></div>
+<div class="box"></div>
+<div class="box"></div>
+<button id="highlightButton">Подсветить блоки</button>
+<script>
+    const boxElements = document.getElementsByClassName('box');
+    const highlightButton = document.getElementById('highlightButton');
+    highlightButton.addEventListener('click', () => {
+        for (let el of boxElements) {
+            el.classList.add('highlight');
+        }
+    })
+</script>
+</body>
+</html>
