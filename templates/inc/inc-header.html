@@ -31,6 +31,13 @@
                         </li>
                     {% endif %}
                     {% if request.user.is_authenticated %}
+                        <li class="ps-3">
+                            <a class="btn btn-outline-warning" href="{% url 'notifications' %}">
+                                <i class="fas fa-bell"></i> Уведомления
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if request.user.is_authenticated %}
                         <li class="ms-4">
                             <div class="pt-2" style="color: white">Welcome, {{ request.user.username }}
                                 <a href="{% url 'logout' %}">Выйти</a>

@@ -18,4 +18,5 @@ urlpatterns = [
     path('registration', views.user_registration, name='registration'),
     path('comment/add', views.comment_add, name="comment_add"),
     path('snippets/stats', views.snippet_stats, name="snippet-stats"),
+    path('notifications/', views.user_notifications, name="notifications"),
 ]

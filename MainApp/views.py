@@ -1,7 +1,7 @@
 from django.db.models import F, Q, Count, Avg
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES
+from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES, Notification
 from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -249,3 +249,19 @@ def snippet_stats(request):
     }
 
     return render(request, "pages/snippet_stats.html", context)
+
+
+@login_required
+def user_notifications(request):
+    """Страница с уведомлениями пользователя"""
+    # Отмечаем все уведомления как прочитанные при переходе на страницу
+    Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+
+    # Получаем все уведомления для авторизованного пользователя, сортируем по дате создания
+    notifications = Notification.objects.filter(recipient=request.user)
+
+    context = {
+        'pagename': 'Мои уведомления',
+        'notifications': notifications
+    }
+    return render(request, 'pages/notifications.html', context)
