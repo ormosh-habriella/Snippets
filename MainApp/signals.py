@@ -2,8 +2,11 @@ from django.db.models.signals import post_save  # Импортируем post_sa
 from django.dispatch import receiver
 from django.contrib.auth.models import User  # Импортируем модель User
 from django.dispatch import receiver, Signal
-from MainApp.models import Snippet
+from MainApp.models import Snippet, Comment, Notification
 from django.db.models import F
+
+
+
 
 
 # Декоратор @receiver() связывает функцию send_registration_message
@@ -32,3 +35,15 @@ def add_views_count(sender, snippet, **kwargs):
     snippet.views_count = F('views_count') + 1
     snippet.save(update_fields=['views_count'])
     snippet.refresh_from_db()
+
+
+
+@receiver(post_save, sender=Comment)
+def create_comment_notification(sender, instance, created, **kwargs):
+    if created and instance.snippet.user and instance.author != instance.snippet.user:
+        Notification.objects.create(
+            recipient=instance.snippet.user,
+            notification_type="comment",
+            title="Новый комментарий к вашему сниппету",
+            message=f"Пользователь {instance.author.username} оставил комментарий: {instance.text}"
+        )
