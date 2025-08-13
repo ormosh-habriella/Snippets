@@ -53,5 +53,5 @@ function poll() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    startPolling();
+    //startPolling();
 });

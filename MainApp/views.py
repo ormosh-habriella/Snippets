@@ -1,7 +1,8 @@
+from django.db import IntegrityError
 from django.db.models import F, Q, Count, Avg
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES, Notification
+from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES, Notification, LikeDislike
 from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -371,3 +372,27 @@ def unread_notifications_count(request):
         'unread_count': unread_count,
         'timestamp': str(datetime.now())
     })
+
+
+@login_required
+def comment_like(request, id, vote):
+    comment = get_object_or_404(Comment, id=id)
+    user = request.user
+
+    try:
+        LikeDislike.objects.create(
+            user=user,
+            content_object=comment,
+            vote=vote
+        )
+    except IntegrityError:
+        like = LikeDislike.objects.get(user=user, object_id=id)
+        like.delete()
+
+    LikeDislike.objects.create(
+        user=user,
+        content_object=comment,
+        vote=vote
+    )
+
+    return redirect('snippet-detail', id=comment.snippet.id)
