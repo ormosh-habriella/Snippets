@@ -396,3 +396,40 @@ def comment_like(request, id, vote):
     )
 
     return redirect('snippet-detail', id=comment.snippet.id)
+
+
+def user_profile(request):
+    user = request.user
+    snippets = Snippet.objects.filter(user=user)
+
+    all_snippets = snippets.count()
+    avg_views = snippets.aggregate(Avg('views_count'))['views_count__avg']
+    top_snippets = snippets.order_by('-views_count')[:5]
+
+    snippet_actions = [
+        {'description': f'Создан сниппет "{s.name}"', 'date': s.creation_date, 'type': 'snippet_created'}
+        for s in snippets
+    ]
+    comments = Comment.objects.filter(author=user)
+    comment_actions = [
+        {'description': f'Добавлен комментарий к "{c.snippet.name}"', 'date': c.creation_date, 'type': 'comment_added'}
+        for c in comments
+    ]
+    user_actions = sorted(snippet_actions + comment_actions, key=lambda x: x['date'], reverse=True)[:20]
+
+    context = {
+        'profile_user': user,
+        'all_snippets': all_snippets,
+        'avg_views': avg_views,
+        'top_snippets': top_snippets,
+        'user_actions': user_actions,
+    }
+    return render(request, 'pages/user_profile.html', context)
+
+
+def edit_profile(request):
+    ...
+
+
+def password_change(request):
+    ...

@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ pagename }}{% endblock %}
+
+{% block style %}
+    {{ block.super }}
+    <style>
+        .profile-header {
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #dee2e6;
+            object-fit: cover;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            background: none;
+        }
+
+        .tab-content {
+            padding: 1rem 0;
+        }
+
+        .action-item {
+            padding: 1rem;
+            border-left: 3px solid #667eea;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .action-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .snippet-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .snippet-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="profile-header">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <img src="{% static 'images/kotik.png' %}" alt="Аватар" class="profile-avatar">
+                    </div>
+                    <div class="col-md-6">
+                        <h1>@{{ profile_user.username }}</h1>
+                        <p class="mb-2">Дата регистрации: {{ profile_user.date_joined|date:"d.m.Y" }}</p>
+                    </div>
+                    <div class="col-md-3 text-md-end text-center mt-3 mt-md-0">
+                        {% if user == profile_user %}
+                            <a href="{% url 'edit-profile' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i> Редактировать
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                <i class="fas fa-user"></i> Информация
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">
+                <i class="fas fa-chart-bar"></i> Статистика
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
+                <i class="fas fa-history"></i> История
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="profileTabContent">
+        <!-- Вкладка Информация -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Основная информация</h4>
+                    <table class="table">
+                        <tr>
+                            <td><strong>Имя пользователя:</strong></td>
+                            <td>{{ profile_user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Имя:</strong></td>
+                            <td>{{ profile_user.first_name|default:"Не указано" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Фамилия:</strong></td>
+                            <td>{{ profile_user.last_name|default:"Не указано" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email:</strong></td>
+                            <td>{{ profile_user.email|default:"Не указан" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Дата регистрации:</strong></td>
+                            <td>{{ profile_user.date_joined|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Последний вход:</strong></td>
+                            <td>{{ profile_user.last_login|date:"d.m.Y H:i"|default:"Никогда" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h4>Дополнительная информация</h4>
+                        <p><strong>О себе:</strong><br>Заглушка</p>
+                        <p><strong>Веб-сайт:</strong><br>
+                            <a href="{{ profile_user.profile.website }}" target="_blank">https://example.com</a>
+                        </p>
+                    {% if user == profile_user %}
+                        <p><strong>Смена пароля:</strong><br>
+                            <a href="{% url 'password_change' %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-key"></i> Изменить пароль
+                            </a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Статистика -->
+        <div class="tab-pane fade" id="stats" role="tabpanel">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Общая статистика</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h3 class="text-primary">{{ all_snippets }}</h3>
+                                    <p>Всего сниппетов</p>
+                                </div>
+                                <div class="col-6">
+                                    <h3 class="text-success">{{ avg_views}}</h3>
+                                    <p>Сред. просмотров</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4>Топ сниппетов по просмотрам</h4>
+                    {% if top_snippets %}
+                        {% for snippet in top_snippets %}
+                            <div class="snippet-card">
+                                <h6><a href="{% url 'snippet-detail' snippet.id %}">{{ snippet.name }}</a></h6>
+                                <p class="mb-1">
+                                    <span class="badge bg-primary">{{ snippet.lang }}</span>
+                                    <span class="text-muted">{{ snippet.creation_date|date:"d.m.Y" }}</span>
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-eye"></i> {{ snippet.views_count }} просмотров
+                                </p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Нет сниппетов для отображения</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка История -->
+        <div class="tab-pane fade" id="history" role="tabpanel">
+            <h4>История действий</h4>
+            {% if user_actions %}
+                {% for action in user_actions %}
+                    <div class="action-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="mb-1">{{ action.description }}</p>
+                                <small class="action-date">{{ action.date|date:"d.m.Y H:i" }}</small>
+                            </div>
+                            {% if action.type == 'snippet_created' %}
+                                <span class="badge bg-success">Сниппет</span>
+                            {% elif action.type == 'comment_added' %}
+                                <span class="badge bg-info">Комментарий</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">История действий пуста</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+
+    </script>
+{% endblock %}
