@@ -56,9 +56,9 @@ def snippets_page(request, my_snippets, num_snippets_on_page=5):
     else:
         pagename = 'Просмотр сниппетов'
         if request.user.is_authenticated:  # auth: all public + self private
-            snippets = Snippet.objects.filter(Q(public=True) | Q(public=False, user=request.user))
+            snippets = Snippet.objects.filter(Q(public=True) | Q(public=False, user=request.user)).select_related("user")
         else:  # not auth: all public
-            snippets = Snippet.objects.filter(public=True)
+            snippets = Snippet.objects.filter(public=True).select_related("user")
 
         # search
     search = request.GET.get("search")
