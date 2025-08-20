@@ -15,6 +15,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 from datetime import datetime
+from MainApp.utils import verify_activation_token, send_activation_email
+
 
 def index_page(request):
     context = {'pagename': 'PythonBin'}
@@ -167,8 +169,9 @@ def login(request):
 
         user = auth.authenticate(request, username=username, password=password)
         if user is not None:
-            auth.login(request, user)
-            return redirect('home')
+            if user.is_active:
+                auth.login(request, user)
+                return redirect('home')
         else:
             context = {
                 "errors": "Неверный username или password",
@@ -207,6 +210,7 @@ def user_registration(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            send_activation_email(user, request)
             # --- ОТПРАВКА СООБЩЕНИЯ ---
             messages.success(request, f'Добро пожаловать, {user.username}! Вы успешно зарегистрированы.')
             # --- КОНЕЦ ОТПРАВКИ СООБЩЕНИЯ ---
@@ -433,3 +437,32 @@ def edit_profile(request):
 
 def password_change(request):
     ...
+
+
+def activate_account(request, user_id, token):
+    """
+    Подтверждение аккаунта пользователя по токену
+    """
+    try:
+        user = User.objects.get(id=user_id)
+
+        # Проверяем, не подтвержден ли уже аккаунт
+        if user.is_active:
+            messages.info(request, 'Ваш аккаунт уже подтвержден.')
+            return redirect('home')
+
+        # Проверяем токен
+        if verify_activation_token(user, token):
+            user.is_active = True
+            user.save()
+            messages.success(request,
+                             'Ваш аккаунт успешно подтвержден! Теперь вы можете войти в систему.')
+            return redirect('home')
+        else:
+            messages.error(request,
+                           'Недействительная ссылка для подтверждения. Возможно, она устарела.')
+            return redirect('home')
+
+    except User.DoesNotExist:
+        messages.error(request, 'Пользователь не найден.')
+        return redirect('home')

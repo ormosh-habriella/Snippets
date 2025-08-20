@@ -163,3 +163,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SHELL_PLUS_PRE_IMPORTS = [
     ('MainApp.factories', ('UserFactory', 'TagFactory', 'SnippetFactory', 'CommentFactory')),
 ]
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
