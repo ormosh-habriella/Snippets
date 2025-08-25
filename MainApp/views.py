@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.db.models import F, Q, Count, Avg
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES, Notification, LikeDislike
+from MainApp.models import Snippet, LANG_ICONS, Comment, LANG_CHOICES, Notification, LikeDislike, SnippetSubscription
 from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -466,3 +466,13 @@ def activate_account(request, user_id, token):
     except User.DoesNotExist:
         messages.error(request, 'Пользователь не найден.')
         return redirect('home')
+
+
+@login_required
+def snippet_subscribe(request):
+    if request.method == 'POST':
+        snippet_id = request.POST.get('id')
+        snippet = get_object_or_404(Snippet, id=snippet_id)
+        SnippetSubscription.objects.get_or_create(user=request.user, snippet=snippet)
+
+        return redirect('snippet-detail', pk=snippet_id)

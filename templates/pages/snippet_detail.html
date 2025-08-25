@@ -8,6 +8,14 @@
 
 {% block content %}
     <div class="container">
+    <div class="row">
+        <form method="post" action="{% url 'snippet-subscribe' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-dark">
+                <i class="fa-solid fa-bell"></i>Подписаться
+            </button>
+        </form>
+    </div>
         <div class="row">
             <div class="col">
                 <fieldset disabled>

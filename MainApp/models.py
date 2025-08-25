@@ -101,3 +101,16 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Уведомление для {self.recipient.username}: {self.title}"
+
+
+class SnippetSubscription(models.Model):
+    snippet = models.ForeignKey(to=Snippet, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'snippet']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} → {self.snippet.name}"
