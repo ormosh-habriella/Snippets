@@ -19,6 +19,9 @@ LANG_ICONS = {
     "javascript": "fa-js"
 }
 
+User._meta.get_field('email')._unique = True
+
+
 class LikeDislike(models.Model):
     LIKE = 1
     DISLIKE = -1
