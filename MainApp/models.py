@@ -106,6 +106,20 @@ class Notification(models.Model):
         return f"Уведомление для {self.recipient.username}: {self.title}"
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    bio = models.TextField(max_length=500, blank=True)
+    website = models.URLField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_avatar_url(self):
+        if self.avatar:
+            return self.avatar.url
+        return '/static/images/default-avatar.png'
+
+
 class SnippetSubscription(models.Model):
     snippet = models.ForeignKey(to=Snippet, on_delete=models.CASCADE, related_name="subscriptions")
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="snippet_subscriptions")
