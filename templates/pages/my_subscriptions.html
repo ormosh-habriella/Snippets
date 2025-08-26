@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Мои подписки</h2>
+
+
+    {% if subscriptions %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for sub in subscriptions %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ sub.snippet.name }}</h5>
+                        <p class="card-text">
+                            Автор: {{ sub.snippet.author.username }}<br>
+                            Подписка с: {{ sub.created_at|date:"d.m.Y H:i" }}
+                        </p>
+                        <a href="{% url 'snippet-detail' sub.snippet.id %}" class="btn btn-primary">Просмотр</a>
+                        <form action="{% url 'snippet-unsubscribe' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ sub.snippet.id }}">
+                            <button type="submit" class="btn btn-outline-danger">Отписаться</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>У вас нет подписок.</p>
+    {% endif %}
+
+    <a href="{% url 'snippets-page' %}" class="btn btn-secondary mt-3">← Назад к списку сниппетов</a>
+</div>
+{% endblock %}

@@ -28,6 +28,7 @@ urlpatterns = [
     path('password/change/', views.password_change, name="password_change"),
     path('snippet/subscribe/', views.snippet_subscribe, name="snippet-subscribe"),
     path('snippet/unsubscribe/', views.snippet_unsubscribe, name="snippet-unsubscribe"),
+    path('subscriptions/', views.my_subscriptions, name='my-subscriptions'),
     path('activate/<int:user_id>/<str:token>/', views.activate_account, name="activate-account"),
     path('resend_email/', views.resend_email, name="resend-email"),
     path('api/simple-data/', views.simple_api_view, name='simple_api'),

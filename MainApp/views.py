@@ -533,6 +533,17 @@ def snippet_unsubscribe(request):
     if request.method == 'POST':
         snippet_id = request.POST.get('id')
         snippet = get_object_or_404(Snippet, id=snippet_id)
-        SnippetSubscription.objects.get_or_create(user=request.user, snippet=snippet)
+        SnippetSubscription.objects.filter(user=request.user, snippet=snippet).delete()
 
         return redirect('snippet-detail', pk=snippet_id)
+
+
+@login_required
+def my_subscriptions(request):
+    subscriptions = SnippetSubscription.objects.filter(user=request.user).select_related('snippet')
+
+    context = {
+        'subscriptions': subscriptions
+    }
+
+    return render(request, 'pages/my_subscriptions.html', context)
