@@ -37,6 +37,16 @@ urlpatterns = [
     path('comment/<int:id>/disliked', views.comment_like,{'vote': -1}, name='comment-dislike'),
 ]+ debug_toolbar_urls()
 
+# Добавляем debug_toolbar URLs только в режиме разработки
+if settings.DEBUG:
+    try:
+        import debug_toolbar
+        urlpatterns += [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ]
+    except ImportError:
+        pass
+
 #if settings.DEBUG:
     #urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     #urlpatterns += path('__debug__/', include(debug_toolbar.urls))
