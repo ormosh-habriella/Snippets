@@ -121,11 +121,17 @@ def snippet_detail(request, id):
     snippet_view.send(sender=None, snippet=snippet)
     comments = Comment.objects.all()
     comment_form = CommentForm()
+
+    is_subscribed = False
+    if request.user.is_authenticated:
+        is_subscribed = snippet.subscriptions.filter(user=request.user).exists()
+
     context = {
         'pagename': f'Сниппет: {snippet.name}',
         'snippet': snippet,
         'comments': comments,
         'comment_form': comment_form,
+        'is_subscribed': is_subscribed,
     }
     return render(request, 'pages/snippet_detail.html', context)
 
@@ -470,6 +476,16 @@ def activate_account(request, user_id, token):
 
 @login_required
 def snippet_subscribe(request):
+    if request.method == 'POST':
+        snippet_id = request.POST.get('id')
+        snippet = get_object_or_404(Snippet, id=snippet_id)
+        SnippetSubscription.objects.get_or_create(user=request.user, snippet=snippet)
+
+        return redirect('snippet-detail', pk=snippet_id)
+
+
+@login_required
+def snippet_unsubscribe(request):
     if request.method == 'POST':
         snippet_id = request.POST.get('id')
         snippet = get_object_or_404(Snippet, id=snippet_id)

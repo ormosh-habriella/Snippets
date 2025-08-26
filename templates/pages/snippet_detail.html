@@ -9,12 +9,25 @@
 {% block content %}
     <div class="container">
     <div class="row">
-        <form method="post" action="{% url 'snippet-subscribe' %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-dark">
-                <i class="fa-solid fa-bell"></i>Подписаться
-            </button>
-        </form>
+        {% if user.is_authenticated %}
+            {% if is_subscribed %}
+                <form method="post" action="{% url 'snippet-unsubscribe' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ snippet.id }}">
+                <button type="submit" class="btn btn-outline-dark">
+                    <i class="fa-solid fa-bell"></i>Отписаться
+                </button>
+                </form>
+            {% else %}
+            <form method="post" action="{% url 'snippet-subscribe' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ snippet.id }}">
+                <button type="submit" class="btn btn-outline-dark">
+                    <i class="fa-solid fa-bell"></i>Подписаться
+                </button>
+            </form>
+            {% endif %}
+        {% endif %}
     </div>
         <div class="row">
             <div class="col">

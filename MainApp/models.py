@@ -107,8 +107,8 @@ class Notification(models.Model):
 
 
 class SnippetSubscription(models.Model):
-    snippet = models.ForeignKey(to=Snippet, on_delete=models.CASCADE)
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    snippet = models.ForeignKey(to=Snippet, on_delete=models.CASCADE, related_name="subscriptions")
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="snippet_subscriptions")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

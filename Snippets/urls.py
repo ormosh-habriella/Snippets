@@ -28,6 +28,7 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile, name="edit-profile"),
     path('password/change/', views.password_change, name="password_change"),
     path('snippet/subscribe/', views.snippet_subscribe, name="snippet-subscribe"),
+    path('snippet/unsubscribe/', views.snippet_unsubscribe, name="snippet-unsubscribe"),
     path('activate/<int:user_id>/<str:token>/', views.activate_account, name="password_change"),
     path('api/simple-data/', views.simple_api_view, name='simple_api'),
     #path('api-page/', views.api_test_page, name='api-test-page'),
