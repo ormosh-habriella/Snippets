@@ -4,7 +4,6 @@ from django.conf.urls.static import static
 from django.conf import settings
 from MainApp import views, views_cbv
 from django.contrib import admin
-from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
@@ -35,18 +34,20 @@ urlpatterns = [
     path('api/notifications/unread-count/', views.unread_notifications_count, name='unread_notifications_count'),
     path('comment/<int:id>/liked', views.comment_like,{'vote': 1}, name='comment-like'),
     path('comment/<int:id>/disliked', views.comment_like,{'vote': -1}, name='comment-dislike'),
-]+ debug_toolbar_urls()
-
+]
 # Добавляем debug_toolbar URLs только в режиме разработки
 if settings.DEBUG:
     try:
         import debug_toolbar
+
         urlpatterns += [
             path('__debug__/', include(debug_toolbar.urls)),
         ]
     except ImportError:
         pass
 
-#if settings.DEBUG:
-    #urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    #urlpatterns += path('__debug__/', include(debug_toolbar.urls))
+# Добавляем обработку статических файлов только в режиме разработки
+# В продакшене Django использует встроенную обработку статических файлов
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
