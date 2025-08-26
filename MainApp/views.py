@@ -20,10 +20,6 @@ from MainApp.utils import verify_activation_token, send_activation_email
 
 def index_page(request):
     context = {'pagename': 'PythonBin'}
-    messages.success(request, 'Добро пожаловать на сайт')
-    messages.warning(request, 'Доработать закрытие сообщений по таймеру')
-    messages.warning(request, 'Доработать закрытие сообщений по таймеру')
-    messages.warning(request, 'Доработать закрытие сообщений по таймеру')
     return render(request, 'pages/index.html', context)
 
 
@@ -179,9 +175,20 @@ def login(request):
                 auth.login(request, user)
                 return redirect('home')
         else:
-            context = {
-                "errors": "Неверный username или password",
-            }
+            try:
+                user = User.objects.get(username=username)
+                if not user.check_password(password):
+                    raise User.DoesNotExist()
+                # 2
+                context = {
+                    "errors": ["Ваш аккаунт не подтвержден. Проверьте email для подтверждения"],
+                    "username": username
+                }
+            except User.DoesNotExist:  # 3
+                context = {
+                    "errors": ["Неверные username или password"],
+                    "username": username
+                }
             return render(request, "pages/index.html", context)
 
 
@@ -217,9 +224,7 @@ def user_registration(request):
         if form.is_valid():
             user = form.save()
             send_activation_email(user, request)
-            # --- ОТПРАВКА СООБЩЕНИЯ ---
             messages.success(request, f'Добро пожаловать, {user.username}! Вы успешно зарегистрированы.')
-            # --- КОНЕЦ ОТПРАВКИ СООБЩЕНИЯ ---
             return redirect('home')
         else:
             context = {
@@ -472,6 +477,24 @@ def activate_account(request, user_id, token):
     except User.DoesNotExist:
         messages.error(request, 'Пользователь не найден.')
         return redirect('home')
+
+
+# GET / POST
+def resend_email(request):
+    if request.method == 'GET':
+        return render(request, 'pages/resend_email.html')
+    elif request.method == 'POST':
+        email = request.POST.get("email")
+        # TODO: добавить валидацию email
+        user = User.objects.get(email=email)
+        try:
+            send_activation_email(user, request)
+            messages.success(request, "Повторный email отправлен. Проверьте почту.")
+        except:
+            messages.error(request, "Отправить email не удалось.")
+        return redirect('home')
+    else:
+        raise Http404
 
 
 @login_required
